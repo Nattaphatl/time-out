@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ระบบเข้างาน</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1f2933, #111827);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: #0f172a;
+      padding: 30px;
+      border-radius: 16px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,.4);
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border-radius: 12px;
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .in { background: #22c55e; }
+    .out { background: #ef4444; }
+    .status {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>ระบบเข้างาน</h2>
+
+    <input type="text" id="name" placeholder="ชื่อ - นามสกุล">
+
+    <button class="in" onclick="checkIn()">เข้างาน</button>
+    <button class="out" onclick="checkOut()">เลิกงาน</button>
+
+    <div class="status" id="status">พร้อมใช้งาน</div>
+  </div>
+
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbzNrsrzl8_LOfmGvmeXjdBE3qRHxG7t4x2YZlQdf86YdobChW5GtlAn_E7184vtZFX9/exec";
+
+function getLocation(callback) {
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      callback(pos.coords.latitude, pos.coords.longitude);
+    },
+    () => {
+      callback("ไม่ระบุ", "ไม่ระบุ");
+    }
+  );
+}
+
+function sendData(type) {
+  const name = document.getElementById("name").value;
+  if (!name) {
+    alert("กรุณากรอกชื่อ");
+    return;
+  }
+
+  getLocation((lat, lng) => {
+    fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify({
+        name: name,
+        type: type,
+        latitude: lat,
+        longitude: lng
+      })
+    });
+
+    document.getElementById("status").innerText =
+      (type === "IN" ? "บันทึกเข้างานแล้ว" : "บันทึกเลิกงานแล้ว");
+  });
+}
+
+function checkIn() { sendData("IN"); }
+function checkOut() { sendData("OUT"); }
+</script>
+
+</body>
+</html>

@@ -1,104 +1,127 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>ระบบเข้างาน</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1f2933, #111827);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .card {
-      background: #0f172a;
-      padding: 30px;
-      border-radius: 16px;
-      width: 320px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,.4);
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      margin-bottom: 15px;
-      font-size: 16px;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      font-size: 18px;
-      border-radius: 12px;
-      border: none;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    .in { background: #22c55e; }
-    .out { background: #ef4444; }
-    .status {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #94a3b8;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>ระบบเข้างาน - เลิกงาน</title>
+
+<style>
+/* ===== THEME : Luxury Modern ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+.card {
+  width: 360px;
+  padding: 40px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 30px;
+  font-size: 26px;
+  letter-spacing: 1px;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  margin-bottom: 25px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  border-radius: 16px;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button.in {
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  color: #052e16;
+  margin-bottom: 15px;
+}
+
+button.out {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+  color: #fff;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.status {
+  margin-top: 20px;
+  font-size: 15px;
+  opacity: 0.9;
+}
+</style>
 </head>
 
 <body>
-  <div class="card">
-    <h2>ระบบเข้างาน</h2>
 
-    <input type="text" id="name" placeholder="ชื่อ - นามสกุล">
+<div class="card">
+  <h1>🕘 ระบบเข้างาน</h1>
 
-    <button class="in" onclick="checkIn()">เข้างาน</button>
-    <button class="out" onclick="checkOut()">เลิกงาน</button>
+  <input type="text" id="name" placeholder="ชื่อ - สกุล">
 
-    <div class="status" id="status">พร้อมใช้งาน</div>
-  </div>
+  <button class="in" onclick="checkIn()">เข้างาน</button>
+  <button class="out" onclick="checkOut()">เลิกงาน</button>
+
+  <div class="status" id="status">พร้อมใช้งาน</div>
+</div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbzqsyD5hx7HCQeWfF5iCHv8VT7mUQdlBq5zReMUHC7O1h4TAynHtKTVc9d27R-bV3qL/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbw8fHAsk4QJuvDj-EVUmtM9KOw1nSnX7bPo0AF-IGWK5uIcyN0NSvhtTPAVlzLhm2fJ/exec";
 
-function getLocation(callback) {
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      callback(pos.coords.latitude, pos.coords.longitude);
-    },
-    () => {
-      callback("ไม่ระบุ", "ไม่ระบุ");
-    }
-  );
-}
-
-function sendData(type) {
-  const name = document.getElementById("name").value;
+function send(type) {
+  const name = document.getElementById("name").value.trim();
   if (!name) {
-    alert("กรุณากรอกชื่อ");
+    alert("กรุณากรอกชื่อ - สกุล");
     return;
   }
 
-  getLocation((lat, lng) => {
-    fetch(scriptURL, {
-      method: "POST",
-      body: JSON.stringify({
-        name: name,
-        type: type,
-        latitude: lat,
-        longitude: lng
-      })
-    });
-
+  fetch(GAS_URL, {
+    method: "POST",
+    body: JSON.stringify({ name, type })
+  })
+  .then(res => res.json())
+  .then(() => {
     document.getElementById("status").innerText =
-      (type === "IN" ? "บันทึกเข้างานแล้ว" : "บันทึกเลิกงานแล้ว");
+      type === "IN"
+        ? "✅ บันทึกเข้างานเรียบร้อย (คำนวณเงินแล้ว)"
+        : "✅ บันทึกเลิกงานเรียบร้อย";
+  })
+  .catch(() => {
+    document.getElementById("status").innerText = "❌ เกิดข้อผิดพลาด";
   });
 }
 
-function checkIn() { sendData("IN"); }
-function checkOut() { sendData("OUT"); }
+function checkIn() { send("IN"); }
+function checkOut() { send("OUT"); }
 </script>
 
 </body>
